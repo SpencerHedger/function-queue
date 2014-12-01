@@ -1,0 +1,46 @@
+<html>
+<body>
+<h1>FuncQueue example</h1>
+<div id="messages"></div>
+
+<script>
+  // Convenience function to write a message into the message div
+	function write(message) {
+		document.getElementById('messages').innerHTML += message + '<br \/>';
+	}
+
+  // Create a new queue
+	var queue = FuncQueue.create({ ignoreErrors: false, timeout: 15000, onError: function(message) { console.log(message); }, onTimeout: function() { console.log('failed'); } });
+
+  // Add some function calls to the queue
+	queue.add(function(complete) {
+		setTimeout(function() {
+			write('task 1 ready');
+			
+			// Inform the queue callback that the task is done, passing some data to be used later if required
+			complete({ task: 1, message: 'example' });
+		}, 5000);
+	});
+
+	queue.add(function(complete, error) {
+		setTimeout(function() {
+			write('task 2 ready');
+			complete(); // No data is passed in this example
+		}, 3000);
+	});
+
+	queue.add(function(complete) {
+		setTimeout(function() {
+			write('task 3 ready');
+			complete('3');
+		}, 10000);
+	});
+
+  // Run the functions in the queue, when they are finished, the anonymous function will be called
+	queue.run(function(data) {
+			write('All done');
+			write(data.length);
+	});
+</script>
+</body>
+</html>
